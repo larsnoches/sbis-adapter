@@ -1,6 +1,8 @@
 package org.cyrilselyanin.service;
 
 import org.cyrilselyanin.dto.TokenRequestDto;
+import org.cyrilselyanin.exception.RegCashException;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -15,14 +17,13 @@ import static org.hamcrest.Matchers.instanceOf;
 @ExtendWith(MockitoExtension.class)
 class SbisServiceTest {
     SbisServiceImpl sbisService;
+    String token;
+    String sid;
 
-    @BeforeEach
+    @BeforeAll
     public void init() {
         sbisService = new SbisServiceImpl();
-    }
 
-    @Test
-    public void getToken_thenCorrect() {
         TokenRequestDto requestDto = TokenRequestDto.create(
                 "appClientId_123",
                 "appSecret_123",
@@ -31,14 +32,25 @@ class SbisServiceTest {
 
         try {
             sbisService.getToken(requestDto);
-            String token = sbisService.getToken();
-            String sid = sbisService.getSid();
-            assertNotNull(token);
-            assertNotNull(sid);
-            assertThat(token, instanceOf(String.class));
-            assertThat(sid, instanceOf(String.class));
+            token = sbisService.getToken();
+            sid = sbisService.getSid();
         } catch (IOException ex) {
             System.out.println(ex);
         }
+    }
+
+    @Test
+    public void getToken_thenCorrect() {
+        assertNotNull(token);
+        assertNotNull(sid);
+        assertThat(token, instanceOf(String.class));
+        assertThat(sid, instanceOf(String.class));
+    }
+
+    @Test
+    public void regCash_thenThrowsException() {
+        var ticket = new Ticket();
+
+        assertThrows(RegCashException.class, sbisService.regCash(token, sid, ticket));
     }
 }
