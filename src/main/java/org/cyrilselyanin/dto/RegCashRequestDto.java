@@ -1,6 +1,11 @@
 package org.cyrilselyanin.dto;
 
-public class RegCashDto {
+import lombok.Setter;
+
+import java.math.BigDecimal;
+
+@Setter
+public class RegCashRequestDto {
     // обязательный, ID организации: 123
     Long companyID;
 
@@ -16,34 +21,34 @@ public class RegCashDto {
     Integer operationType;
 
     // обязательный, Сумма наличными: 100
-    Long cashSum;
+    BigDecimal cashSum;
 
     // обязательный, Сумма безналичными: Принимает значение из запроса
-    Long bankSum;
+    BigDecimal bankSum;
 
     // обязательный, Сумма интернет-оплаты: Принимает значение из запроса
-    Long internetSum;
+    BigDecimal internetSum;
 
     //обязательный,	Сумма оплаты на расчетный счет: Принимает значение из запроса
-    Long accountSum;
+    BigDecimal accountSum;
 
     // обязательный, Сумма постоплаты (кредит): Принимает значение из запроса
-    Long postpaySum;
+    BigDecimal postpaySum;
 
     // обязательный, Сумма предоплаты (аванс): Принимает значение из запроса
-    Long prepaySum;
+    BigDecimal prepaySum;
 
     // обязательный, Сумма «БЕЗ НДС»: Принимает значение из запроса
-    Long vatNone;
+    BigDecimal vatNone;
 
     // обязательный, Сумма «НДС 0%»: Принимает значение из запроса
-    Long vatSum0;
+    BigDecimal vatSum0;
 
     // обязательный, Сумма «НДС 10%»: Принимает значение из запроса
-    Long vatSum10;
+    BigDecimal vatSum10;
 
     // обязательный, Сумма «НДС 20%»: Принимает значение из запроса
-    Long vatSum20;
+    BigDecimal vatSum20;
 
     /* обязательный, Отгрузка/списание «в минус».
         Если в результате продаж товар уйдет в минус,
@@ -53,16 +58,16 @@ public class RegCashDto {
     Integer allowRetailPayed;
 
     // обязательный, Сумма «НДС 120%»: 100
-    Long vatSum120;
+    BigDecimal vatSum120;
 
     // обязательный, Наименование товарной позиции: интернет-товар
     String nameNomenclature;
 
     // обязательный, Штрихкод товарной позиции: 123456
-    Long barcodeNomenclature;
+    BigDecimal barcodeNomenclature;
 
     // обязательный, Цена товарной позиции: 100
-    Long priceNomenclature;
+    BigDecimal priceNomenclature;
 
     // обязательный, Количество: 1
     Integer quantityNomenclature;
@@ -74,13 +79,13 @@ public class RegCashDto {
     String kindNomenclature;
 
     // обязательный, Сумма предмета расчета: 100
-    Long totalPriceNomenclature;
+    BigDecimal totalPriceNomenclature;
 
     // обязательный, Сумма НДС предмета расчета: 10
-    Long taxRateNomenclature;
+    BigDecimal taxRateNomenclature;
 
     // обязательный, Итого НДС: 100
-    Long totalVat;
+    BigDecimal totalVat;
 
     // обязательный, ФИО покупателя: Принимает значение из запроса
     String customerFIO;
