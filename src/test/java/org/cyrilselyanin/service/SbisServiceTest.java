@@ -1,5 +1,6 @@
 package org.cyrilselyanin.service;
 
+import org.cyrilselyanin.domain.Ticket;
 import org.cyrilselyanin.dto.TokenRequestDto;
 import org.cyrilselyanin.exception.RegCashException;
 import org.junit.jupiter.api.BeforeAll;
@@ -9,6 +10,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.mockito.junit.jupiter.MockitoExtension;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -20,7 +24,7 @@ class SbisServiceTest {
     String token;
     String sid;
 
-    @BeforeAll
+    @BeforeEach
     public void init() {
         sbisService = new SbisServiceImpl();
 
@@ -31,7 +35,7 @@ class SbisServiceTest {
         );
 
         try {
-            sbisService.getToken(requestDto);
+            sbisService.requestToken(requestDto);
             token = sbisService.getToken();
             sid = sbisService.getSid();
         } catch (IOException ex) {
@@ -48,9 +52,35 @@ class SbisServiceTest {
     }
 
     @Test
-    public void regCash_thenThrowsException() {
-        var ticket = new Ticket();
+    public void regCash_theCorrectException() {
+        Ticket ticket = new Ticket();
+        ticket.setId(1L);
+        ticket.setArrivalBuspointName("Уфа");
+        ticket.setArrivalDatetime(
+                Timestamp.valueOf(
+                        LocalDateTime.of(2022, 06, 01, 10, 10)
+                )
+        );
+        ticket.setDepartureDateTime(
+                Timestamp.valueOf(
+                        LocalDateTime.of(2022, 06, 01, 05, 40)
+                )
+        );
+        ticket.setDepartureBuspointName("Тюмень");
+        ticket.setIssueDateTime(
+                Timestamp.valueOf(
+                        LocalDateTime.of(2022, 05, 15, 8, 00)
+                )
+        );
 
-        assertThrows(RegCashException.class, sbisService.regCash(token, sid, ticket));
+        ticket.setPassengerFirstname("Олег");
+        ticket.setPassengerMiddlename("Иванович");
+        ticket.setPassengerLastname("Иванов");
+        ticket.setPrice(BigDecimal.valueOf(550L));
+        ticket.setQrCode("123-123-123");
+        ticket.setCarrierName("МУП АТП");
+        ticket.setBusRouteNumber("1010");
+
+        assertThrows(RegCashException.class, () -> sbisService.regCash(ticket));
     }
 }
