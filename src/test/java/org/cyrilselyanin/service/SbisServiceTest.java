@@ -3,7 +3,6 @@ package org.cyrilselyanin.service;
 import org.cyrilselyanin.domain.Ticket;
 import org.cyrilselyanin.dto.TokenRequestDto;
 import org.cyrilselyanin.exception.RegCashException;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
