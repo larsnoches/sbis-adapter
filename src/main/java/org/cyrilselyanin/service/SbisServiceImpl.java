@@ -11,6 +11,9 @@ import org.cyrilselyanin.exception.RegCashException;
 import java.io.IOException;
 import java.math.BigDecimal;
 
+/**
+ * Sbis service
+ */
 public class SbisServiceImpl implements SbisService {
     private final String authUrl = "https://online.sbis.ru/oauth/service";
     private final String regCashUrl = "https://api.sbis.ru/retail/sale/create";
@@ -26,14 +29,14 @@ public class SbisServiceImpl implements SbisService {
     @Override
     public void requestToken(TokenRequestDto requestDto) throws IOException {
         TokenResponseDto responseDto = sbisAuthService.getToken(authUrl, requestDto);
-        TokenResponseDtoAdapter tokenResponseDtoAdapter = new TokenResponseDtoAdapter();
-        tokenResponseDtoAdapter.adapt(responseDto);
+        TokenResponseDtoAdapter tokenResponseDtoAdapter = new TokenResponseDtoAdapter(responseDto);
+        tokenResponseDtoAdapter.adapt();
     }
 
     @Override
     public void regCash(Ticket ticket) {
-        RegCashRequestDtoAdapter regCashRequestDtoAdapter = new RegCashRequestDtoAdapter();
-        RegCashRequestDto regCashRequestDto = regCashRequestDtoAdapter.adapt(ticket);
+        RegCashRequestDtoAdapter regCashRequestDtoAdapter = new RegCashRequestDtoAdapter(ticket);
+        RegCashRequestDto regCashRequestDto = regCashRequestDtoAdapter.adapt();
         try {
             RegCashResponseDto regCashResponseDto = sbisRetailService.regCash(
                     regCashUrl, token, sid, regCashRequestDto
@@ -44,56 +47,70 @@ public class SbisServiceImpl implements SbisService {
 
     }
 
+    /**
+     * Adapter for token response dto
+     */
     public class TokenResponseDtoAdapter {
-        public void adapt(TokenResponseDto dto) {
-            token = dto.getToken();
-            sid = dto.getSid();
+        private final TokenResponseDto adaptee;
+        public TokenResponseDtoAdapter(TokenResponseDto adaptee) {
+            this.adaptee = adaptee;
+        }
+        public void adapt() {
+            token = adaptee.getToken();
+            sid = adaptee.getSid();
         }
     }
 
+    /**
+     * Adapter for reg cash request dto
+     */
     public class RegCashRequestDtoAdapter {
-        public RegCashRequestDto adapt(Ticket ticket) {
+        private final Ticket adaptee;
+        public RegCashRequestDtoAdapter(Ticket adaptee) {
+            this.adaptee = adaptee;
+        }
+        public RegCashRequestDto adapt() {
             RegCashRequestDto dto = new RegCashRequestDto();
             dto.setCompanyID(1L);
             dto.setCashierFIO("Wow wow wow");
             dto.setOperationType(1);
             dto.setCashSum(null);
-            dto.setBankSum(ticket.getPrice());
-            dto.setInternetSum(ticket.getPrice());
-            dto.setAccountSum(ticket.getPrice());
+            dto.setBankSum(adaptee.getPrice());
+            dto.setInternetSum(adaptee.getPrice());
+            dto.setAccountSum(adaptee.getPrice());
             dto.setPostpaySum(null);
-            dto.setPrepaySum(ticket.getPrice());
+            dto.setPrepaySum(adaptee.getPrice());
 
-            var vat20 = ticket.getPrice().divide(BigDecimal.valueOf(100));
-            dto.setVatNone(ticket.getPrice().subtract(vat20));
+            var vat20 = adaptee.getPrice().divide(BigDecimal.valueOf(100));
+            dto.setVatNone(adaptee.getPrice().subtract(vat20));
             dto.setVatSum0(null);
             dto.setVatSum10(null);
             dto.setVatSum20(vat20);
 
             dto.setNameNomenclature(String.format(
                     "Маршрут %s, %s - %s, %s",
-                    ticket.getBusRouteNumber(),
-                    ticket.getDepartureBuspointName(),
-                    ticket.getDepartureBuspointName(),
-                    ticket.getDepartureDateTime().toString()
+                    adaptee.getBusRouteNumber(),
+                    adaptee.getDepartureBuspointName(),
+                    adaptee.getDepartureBuspointName(),
+                    adaptee.getDepartureDateTime().toString()
             ));
 
             //
 
             dto.setBarcodeNomenclature(BigDecimal.valueOf(12345));
-            dto.setPriceNomenclature(ticket.getPrice());
+            dto.setPriceNomenclature(adaptee.getPrice());
             dto.setQuantityNomenclature(1);
             dto.setMeasureNomenclature("шт");
             dto.setKindNomenclature("у");
-            dto.setTotalPriceNomenclature(ticket.getPrice());
+            dto.setTotalPriceNomenclature(adaptee.getPrice());
             dto.setTaxRateNomenclature(vat20);
             dto.setTotalVat(vat20);
             dto.setCustomerFIO(
                     String.format(
                             "%s %s %s",
-                            ticket.getPassengerLastname(),
-                            ticket.getPassengerFirstname(),
-                            ticket.getPassengerMiddlename()
+                            adaptee.getPassengerLastname(),
+                            adaptee.getPassengerFirstname(),
+                            adaptee.getPassengerMiddlename()
                     )
             );
             dto.setCustomerEmail(null);
